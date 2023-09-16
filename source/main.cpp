@@ -5,7 +5,7 @@ int main()
 {
     const char* filename = "Onegin.txt";
 
-    text onegin = FillStructText(filename);
+    text onegin = FillText(filename);
 
     PrintNotSortedArray(&onegin);
 
@@ -13,7 +13,7 @@ int main()
 
     PrintSortedByBeginArray(&onegin);
 
-    FreeStructText(&onegin);
+    FreeText(&onegin);
 
     return 0;
 }

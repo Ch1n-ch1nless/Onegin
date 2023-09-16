@@ -1,6 +1,6 @@
 #include "onegin.h"
 
-text FillStructText(const char* filename)
+text FillText(const char* filename)
 {
     text onegin = {.file_ptr   = nullptr,
                    .buf_size   = 0,
@@ -8,9 +8,7 @@ text FillStructText(const char* filename)
                    .line_size  = 0,
                    .line_array = nullptr};
 
-    if(OpenFile(&onegin, filename) != NOERROR) {
-        ...
-    }
+    OpenFile(&onegin, filename);
 
     ReadBuffer(&onegin);
 
@@ -27,13 +25,11 @@ text FillStructText(const char* filename)
 
 void OpenFile(text* onegin, const char* filename)
 {
-    assert(text ? filename);
     struct stat st = {};
 
     onegin->file_ptr = fopen(filename, "r");
     if (onegin->file_ptr == nullptr) {
         // assert(REDASSERT("Error! Program can NOT find the file"));
-        FAILED_OPEN_FILE;
         return;
     }
 
@@ -131,7 +127,7 @@ size_t FillLineArray(text* onegin)
     return 0;
 }
 
-void PrintStructText(FILE* file_ptr, text onegin)
+void PrintText(FILE* file_ptr, text onegin)
 {
     assert(onegin.line_array);
 
@@ -146,7 +142,7 @@ void PrintStructText(FILE* file_ptr, text onegin)
     }
 }
 
-void FreeStructText(text* onegin)
+void FreeText(text* onegin)
 {
     free(onegin->buffer);
     onegin->buffer = nullptr;
@@ -174,7 +170,7 @@ void PrintSortedByBeginArray(text* onegin)
 
     fprintf(file_ptr, "Left->Right:\n\n");
     SortByQsort(onegin);
-    PrintStructText(file_ptr, *onegin);
+    PrintText(file_ptr, *onegin);
 
     fclose(file_ptr);
 }
@@ -191,7 +187,7 @@ void PrintSortedByEndArray(text* onegin)
 
     fprintf(file_ptr, "Right->Left:\n\n");
     SortBubbleArray(onegin, StrcmpRightLeft);
-    PrintStructText(file_ptr, *onegin);
+    PrintText(file_ptr, *onegin);
 
     fclose(file_ptr);
 }
@@ -207,7 +203,7 @@ void PrintNotSortedArray(text* onegin)
     }
 
     fprintf(file_ptr, "Original:\n\n");
-    PrintStructText(file_ptr, *onegin);
+    PrintText(file_ptr, *onegin);
 
     fclose(file_ptr);
 }
