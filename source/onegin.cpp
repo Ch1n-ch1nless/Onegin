@@ -127,9 +127,15 @@ size_t FillLineArray(text* onegin)
     return 0;
 }
 
-void PrintText(FILE* file_ptr, text onegin)
+void PrintText(char* filename, text onegin)
 {
     assert(onegin.line_array);
+
+    FILE* file_ptr = fopen(filename, "w");
+    if (file_ptr == nullptr) {
+        printf("Error! Program can NOT open file: qsort.txt!\n");
+        return;
+    }
 
     for (size_t i = 0; i < onegin.line_size; i++) {
         if ((onegin.line_array)->str_ptr) {
@@ -139,6 +145,10 @@ void PrintText(FILE* file_ptr, text onegin)
             fprintf(file_ptr, "END OF FILE!!!");
             break;
         }
+    }
+
+    if (file_ptr != nullptr) {
+        fclose(file_ptr);
     }
 }
 
@@ -157,54 +167,3 @@ void FreeText(text* onegin)
         onegin->file_ptr = nullptr;
     }
 }
-
-void PrintSortedByBeginArray(text* onegin)
-{
-    assert(onegin);
-
-    FILE* file_ptr = fopen("qsort.txt", "w");
-    if (file_ptr == nullptr) {
-        printf("Error! Program can NOT open file: qsort.txt!\n");
-        return;
-    }
-
-    fprintf(file_ptr, "Left->Right:\n\n");
-    SortByQsort(onegin);
-    PrintText(file_ptr, *onegin);
-
-    fclose(file_ptr);
-}
-
-void PrintSortedByEndArray(text* onegin)
-{
-    assert(onegin);
-
-    FILE* file_ptr = fopen("BubbleSort.txt", "w");
-    if (file_ptr == nullptr) {
-        printf("Error! Program can NOT open file: BubbleSort.txt!\n");
-        return;
-    }
-
-    fprintf(file_ptr, "Right->Left:\n\n");
-    SortBubbleArray(onegin, StrcmpRightLeft);
-    PrintText(file_ptr, *onegin);
-
-    fclose(file_ptr);
-}
-
-void PrintNotSortedArray(text* onegin)
-{
-    assert(onegin);
-
-    FILE* file_ptr = fopen("originaltext.txt", "w");
-    if (file_ptr == nullptr) {
-        printf("Error! Program can NOT open file: originaltext.txt!\n");
-        return;
-    }
-
-    fprintf(file_ptr, "Original:\n\n");
-    PrintText(file_ptr, *onegin);
-
-    fclose(file_ptr);
-}
-

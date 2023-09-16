@@ -7,11 +7,15 @@ int main()
 
     text onegin = FillText(filename);
 
-    PrintNotSortedArray(&onegin);
+    PrintText("originaltext.txt", onegin);
 
-    PrintSortedByEndArray(&onegin);
+    SortBubbleArray(&onegin, StrcmpRightLeft);
 
-    PrintSortedByBeginArray(&onegin);
+    PrintText("BUbbleSort.txt", onegin);
+
+    SortByQsort(&onegin);
+
+    PrintText("qsort.txt",onegin);
 
     FreeText(&onegin);
 
