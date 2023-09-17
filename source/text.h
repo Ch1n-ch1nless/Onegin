@@ -24,4 +24,11 @@ struct text
 
 };
 
+enum ERRORS
+{
+    NO_ERR,
+    OPEN_FILE_ERR,
+    MEM_ALLOC_ERR
+};
+
 #endif // TEXT_H_INCLUDED

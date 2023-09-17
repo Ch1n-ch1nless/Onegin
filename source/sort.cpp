@@ -137,19 +137,3 @@ int StrcmpLeftRight(const line line1, const line line2)
     }
 }
 
-/*
-void MyQuickSort(text* onegin, size_t left, size_t right, int (*comp)(const line, const line))
-{
-    if (right == left) {
-        return;
-    } else if (right - left == 1) {
-
-    }
-}
-
-size_t MyPartition(text* onegin, size_t left, size)t right, int (*comp)(const line, const line))
-{
-
-}
-*/
-

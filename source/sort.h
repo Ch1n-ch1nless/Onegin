@@ -10,7 +10,4 @@ int Compare(const void * str1, const void * str2);
 int StrcmpRightLeft(const line str1, const line str2);
 int StrcmpLeftRight(const line str1, const line str2);
 
-void MyQuickSort(text* onegin, int (*comp)(const line, const line));
-size_t MyPartition(text* onegin, int (*comp)(const line, const line));
-
 #endif // SORT_H_INCLUDED

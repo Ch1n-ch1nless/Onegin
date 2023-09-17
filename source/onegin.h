@@ -2,16 +2,15 @@
 #define ONEGIN_H_INCLUDED
 
 #include "text.h"
-#include "sort.h"
 
 #define REDASSERT(str) "\033[0;31m" #str "\033[0m"
 
-text FillText(const char* filename);
-void OpenFile(text* onegin, const char* filename);
-void ReadBuffer(text* onegin);
-size_t FillLineArray(text* onegin);
+text FillText(const char* filename, ERRORS* error);
+ERRORS OpenFile(text* onegin, const char* filename);
+ERRORS ReadBuffer(text* onegin);
+size_t FillLineArray(text* onegin, ERRORS* error);
 
-void PrintText(char* filename, text onegin);
+ERRORS PrintText(char* filename, text onegin);
 
 void FreeText(text* onegin);
 

@@ -1,6 +1,6 @@
 #include "onegin.h"
 
-text FillText(const char* filename)
+text FillText(const char* filename, ERRORS* error)
 {
     text onegin = {.file_ptr   = nullptr,
                    .buf_size   = 0,
@@ -8,43 +8,53 @@ text FillText(const char* filename)
                    .line_size  = 0,
                    .line_array = nullptr};
 
-    OpenFile(&onegin, filename);
+    if (OpenFile(&onegin, filename) == OPEN_FILE_ERR) {
+        *error = OPEN_FILE_ERR;
+        return onegin;
+    }
 
-    ReadBuffer(&onegin);
+    if (ReadBuffer(&onegin) == MEM_ALLOC_ERR) {
+        *error = MEM_ALLOC_ERR;
+        return onegin;
+    }
 
-    size_t count_of_lines = FillLineArray(&onegin);
+    size_t count_of_lines = FillLineArray(&onegin, error);
 
     if (count_of_lines <= onegin.line_size) {
         onegin.line_size = count_of_lines;
     } else {
-        printf("ERROR! count_of_lines: %d \n line_size!: %d", count_of_lines, onegin.line_size);
+        printf("ERROR! count_of_lines: %d \n line_size!: %d\n", count_of_lines, onegin.line_size);
+        assert(0);
     }
 
     return onegin;
 }
 
-void OpenFile(text* onegin, const char* filename)
+ERRORS OpenFile(text* onegin, const char* filename)
 {
     struct stat st = {};
 
     onegin->file_ptr = fopen(filename, "r");
     if (onegin->file_ptr == nullptr) {
-        // assert(REDASSERT("Error! Program can NOT find the file"));
-        return;
+        printf("onegin.cpp/OpenFile() : %d\n\tError! Program can NOT open file: %s.txt!\n", __LINE__ - 2,
+                                                                                            filename);
+        return OPEN_FILE_ERR;
     }
 
     stat(filename, &st);
     onegin->buf_size = st.st_size;
+    return NO_ERR;
 }
 
-void ReadBuffer(text* onegin)
+ERRORS ReadBuffer(text* onegin)
 {
     assert(onegin);
+    assert(onegin->file_ptr);
 
     onegin->buffer = (char*) calloc(onegin->buf_size + 1, sizeof(char));
     if (onegin->buffer == nullptr) {
-        printf("Error with memory! Program can NOT find free memory. BUY NEW HD, SSD and RAM!!!");
-        return;
+        printf("onegin.cpp/ReadBuffer(): %d\n\tError! Program can NOT allocate memory!", __LINE__ -2);
+        return MEM_ALLOC_ERR;
     }
 
     const size_t symbol_number = fread(onegin->buffer, sizeof(char), onegin->buf_size, onegin->file_ptr);
@@ -55,8 +65,6 @@ void ReadBuffer(text* onegin)
         } else if (ferror(onegin->file_ptr)) {
             printf("Error reading %s", filename);
         }
-
-        ClearStructTextBuffer(onegin);
         #endif
         if (symbol_number < onegin->buf_size) {
             char* buffer = onegin->buffer + symbol_number;
@@ -67,21 +75,27 @@ void ReadBuffer(text* onegin)
             }
         } else {
             printf("ERROR! Symbols in Onegin.txt  more then buf_size!");
-            return;
+            assert(0);
         }
     }
 
     fclose(onegin->file_ptr);
     onegin->file_ptr = nullptr;
+    return NO_ERR;
 }
 
-size_t FillLineArray(text* onegin)
+size_t FillLineArray(text* onegin, ERRORS* error)
 {
     assert(onegin);
     assert(onegin->buffer);
 
     onegin->line_size = onegin->buf_size / 2 + 1;
     onegin->line_array = (line*) calloc(onegin->line_size, sizeof(line));
+    if (onegin->line_array == nullptr) {
+        *error = MEM_ALLOC_ERR;
+        fprintf(stderr, "onegin.cpp/FillLineArray(): %d\n", __LINE__ - 3);
+        return 0;
+    }
 
     size_t count_of_lines = 0;
 
@@ -89,52 +103,44 @@ size_t FillLineArray(text* onegin)
     temp_array->str_ptr = onegin->buffer;
 
     for (size_t i = 1; i < onegin->buf_size; i++) {
-        onegin->buffer++;
-        if (*(onegin->buffer) == '\n')
+        if (*(onegin->buffer + i) == '\n')
         {
-            //printf("Нашли \\n на позиции: %d\n", i);
-            *(onegin->buffer) = '\0';
-            ++(onegin->buffer);
+            *(onegin->buffer + i) = '\0';
             i++;
-            //printf("Нашли \\n на позиции: %d\n", i);
-            *(onegin->buffer) = '\0';
+            *(onegin->buffer + i) = '\0';
 
-            size_t length = onegin->buffer - temp_array->str_ptr - 1;
+            size_t length = (onegin->buffer + i) - temp_array->str_ptr - 1;
             temp_array->str_len = length;
-            //printf("Длина строки № %d : %d\n\n", count_of_lines, length);
 
-            ++(onegin->buffer);
+            i++;
             temp_array++;
-            temp_array->str_ptr =  onegin->buffer;
+            temp_array->str_ptr =  (onegin->buffer + i);
 
             count_of_lines++;
 
         }
         else if (*(onegin->buffer) == '\0')
         {
-            //printf("Нашли конец файла на позиции: %d\n", i);
-
-            size_t length = onegin->buffer - temp_array->str_ptr;
+            size_t length = (onegin->buffer + i) - temp_array->str_ptr;
             temp_array->str_len = length;
-
-            //printf("Длина строки № %d : %d\n\n", count_of_lines, length);
 
             count_of_lines++;
 
             return count_of_lines;
         }
     }
-    return 0;
+    return count_of_lines;
 }
 
-void PrintText(char* filename, text onegin)
+ERRORS PrintText(char* filename, text onegin)
 {
     assert(onegin.line_array);
 
     FILE* file_ptr = fopen(filename, "w");
     if (file_ptr == nullptr) {
-        printf("Error! Program can NOT open file: qsort.txt!\n");
-        return;
+        fprintf(stderr, "onegin.cpp/PrintText() : %d\n\tError! Program can NOT open file: %s\n", __LINE__ - 2,
+                                                                                                 filename);
+        return OPEN_FILE_ERR;
     }
 
     for (size_t i = 0; i < onegin.line_size; i++) {
@@ -150,6 +156,7 @@ void PrintText(char* filename, text onegin)
     if (file_ptr != nullptr) {
         fclose(file_ptr);
     }
+    return NO_ERR;
 }
 
 void FreeText(text* onegin)
