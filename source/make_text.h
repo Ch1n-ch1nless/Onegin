@@ -10,8 +10,4 @@ ERRORS OpenFile(text* onegin, const char* filename);
 ERRORS ReadBuffer(text* onegin);
 size_t FillLineArray(text* onegin, ERRORS* error);
 
-ERRORS PrintText(char* filename, text onegin);
-
-void FreeText(text* onegin);
-
 #endif // ONEGIN_H_INCLUDED

@@ -1,4 +1,5 @@
-#include "onegin.h"
+#include "make_text.h"
+#include "print_text.h"
 #include "sort.h"
 
 int main()
@@ -21,7 +22,7 @@ int main()
 
     if (PrintText("BubbleSort.txt", onegin) == OPEN_FILE_ERR)
     {
-        fprintf(stderr"main.cpp: %d\n", __LINE__ - 2);
+        fprintf(stderr, "main.cpp: %d\n", __LINE__ - 2);
     }
 
     SortByQsort(&onegin);
